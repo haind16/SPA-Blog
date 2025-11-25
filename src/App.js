@@ -1,89 +1,27 @@
+import { useState } from "react";
 import "./styles.css";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Link,
-  Outlet,
-  useParams,
 } from "react-router-dom";
 
-const BlogPosts = {
-  "first-blog-post": {
-    title: "First Blog Post",
-    description: "Lorem ipsum dolor sit amet, consectetur adip.",
-  },
-  "second-blog-post": {
-    title: "Second Blog Post",
-    description: "Hello React Router v6",
-  },
-};
-
-function Posts() {
-  return (
-    <div style={{ padding: 20 }}>
-      <h2>Blog</h2>
-      <Outlet />
-    </div>
-  );
-}
-
-function PostLists() {
-  return (
-    <ul>
-      {Object.entries(BlogPosts).map(([slug, { title }]) => (
-        <li key={slug}>
-          <Link to={`/posts/${slug}`}>
-            <h3>{title}</h3>
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function Post() {
-  const { slug } = useParams();
-  const post = BlogPosts[slug];
-  if (!post) {
-    return <span>The blog post you've requested doesn't exist.</span>;
-  }
-  const { title, description } = post;
-  return (
-    <div style={{ padding: 20 }}>
-      <h3>{title}</h3> <p>{description}</p>{" "}
-    </div>
-  );
-}
-
-function Home() {
-  return (
-    <div style={{ padding: 20 }}>
-      <h2>Home View</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adip.</p>
-    </div>
-  );
-}
-
-function About() {
-  return (
-    <div style={{ padding: 20 }}>
-      <h2>About View</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adip.</p>
-    </div>
-  );
-}
-
-function NoMatch() {
-  return (
-    <div style={{ padding: 20 }}>
-      <h2>404: Page Not Found</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adip.</p>
-    </div>
-  );
-}
+import Login from "./Components/Login";
+import Post from "./Components/Post";
+import Posts from "./Components/Posts";
+import PostLists from "./Components/PostLists";
+import NoMatch from "./Components/NoMatch";
+import Home from "./Components/Home";
+import About from "./Components/About";
+import NewPost from "./Components/NewPost";
+import Stats from "./Components/Starts";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 export default function App() {
+  const [user, setUser] = useState(false);
+
+  console.log(user)
   return (
     <Router>
       <nav style={{ margin: 10 }}>
@@ -96,6 +34,22 @@ export default function App() {
         <Link to="/about" style={{ padding: 5 }}>
           About
         </Link>
+        {user &&
+          <Link to="/newpost" style={{ padding: 5 }}>
+            New Post
+          </Link>
+        }
+        {user && 
+          <Link to="/stats" style={{padding: 5}}> 
+            Stats 
+          </Link>
+        }
+        {!user && 
+          <Link to="/login" style={{padding: 5}}> 
+            Login 
+          </Link>
+        }
+        {user && <span onClick={() => setUser(false)} style={{padding: 5, cursor: 'pointer'}}> Logout </span>}
       </nav>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -103,7 +57,10 @@ export default function App() {
           <Route index element={<PostLists />} />
           <Route path=":slug" element={<Post />} />
         </Route>
+        <Route path="/login" element={<Login onLogin={setUser}/>}/>
+        <Route path="/stats" element={<ProtectedRoute user={user}><Stats/></ProtectedRoute>} />
         <Route path="/about" element={<About />} />
+        <Route path="/newpost" element={<ProtectedRoute user={user}><NewPost/></ProtectedRoute>}/>
         <Route path="*" element={<NoMatch />} />
       </Routes>
     </Router>
