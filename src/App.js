@@ -55,7 +55,9 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/posts" element={<Posts />}>
           <Route index element={<PostLists />} />
-          <Route path=":slug" element={<Post />} />
+          <Route path=":slug" element={<Post />}>
+            <Route path="update" element={<UpdatePost />} />
+          </Route>
         </Route>
         <Route path="/login" element={<Login onLogin={setUser}/>}/>
         <Route path="/stats" element={<ProtectedRoute user={user}><Stats/></ProtectedRoute>} />
